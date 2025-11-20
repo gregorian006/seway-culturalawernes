@@ -107,7 +107,7 @@ const IsometricMap = () => {
       <div ref={mapRef} className="relative w-full max-w-5xl aspect-3/4 md:aspect-video transition-all duration-500 mt-38">
         
         <Image 
-          src="/assets/peta-sumatera-v3.png"
+          src="/assets/Peta-sumatera-v3.png"
           alt="Peta Sumatera Isometric"
           fill
           className="object-contain drop-shadow-[0_35px_35px_rgba(0,0,0,0.5)]"
