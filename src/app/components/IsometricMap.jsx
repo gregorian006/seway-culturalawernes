@@ -112,6 +112,7 @@ const IsometricMap = () => {
           fill
           className="object-contain drop-shadow-[0_35px_35px_rgba(0,0,0,0.5)]"
           priority
+          unoptimized
         />
 
         {/* --- LOOPING TITIK LOKASI (MAPPING DATA) --- */}
