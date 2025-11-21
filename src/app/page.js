@@ -1,21 +1,36 @@
-// Di file src/app/page.js
-import IsometricMap from "./components/IsometricMap"; 
-// Pakai ./ (titik satu) artinya "tetangga satu folder" // Import komponen tadi
+import IsometricMap from "./components/IsometricMap";
+import IntroClouds from "./components/IntroClouds";
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-linear-to-b from-slate-900 to-black overflow-hidden relative">
+    // Layout Utama:
+    // justify-start (HP): Biar konten mulai dari atas (Title dulu, baru map).
+    // md:justify-center (Desktop): Biar semua konten pas di tengah-tengah layar.
+    <main className="flex min-h-screen flex-col items-center justify-start md:justify-center bg-[#d6cbb8] overflow-hidden relative">
       
-      {/* Judul Website */}
-      <div className="absolute top-10 z-10 text-center">
-        <h1 className="text-4xl md:text-6xl font-bold text-transparent bg-clip-text bg-linear-to-r from-yellow-400 to-orange-500 tracking-tight">
-          SUMATERA CULTURE FEST
+      <IntroClouds /> 
+
+      {/* Background decorations (Tetap) */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,#a89f91_100%)] pointer-events-none"></div>
+      <div className="absolute inset-0 bg-paper-texture opacity-40 mix-blend-multiply pointer-events-none"></div>
+
+      {/* JUDUL */}
+      {/* HP: top-12 (Turun dikit). Desktop: top-8 (Mepet atas biar peta lega) */}
+      <div className="absolute top-12 md:top-8 z-20 text-center px-4 w-full pointer-events-none">
+        <h1 className="text-3xl md:text-7xl font-serif font-bold text-[#292524] tracking-[0.1em] md:tracking-[0.2em] drop-shadow-sm uppercase leading-tight">
+          Sumatera
         </h1>
-        <p className="text-slate-400 mt-2 text-sm md:text-base">Jelajahi Keunikan Budaya Pulau Emas</p>
+        <div className="h-[2px] w-16 md:w-32 bg-[#292524] mx-auto my-2 md:my-4"></div>
+        <p className="text-[#44403c] text-[10px] md:text-sm font-bold font-serif tracking-[0.2em] md:tracking-[0.4em] uppercase">
+          Culture Fest • Est. 2024
+        </p>
       </div>
 
-      {/* Komponen Peta Kita */}
-      <IsometricMap />
+      {/* WADAH KOMPONEN PETA */}
+      {/* HP: mt-0 (Karena di IsometricMap udah ada mt-24). Desktop: mt-0 (Tengah). */}
+      <div className="z-10 relative w-full flex justify-center">
+         <IsometricMap />
+      </div>
       
     </main>
   );

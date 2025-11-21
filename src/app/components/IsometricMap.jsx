@@ -6,20 +6,17 @@ import { gsap } from 'gsap';
 import { regionsData } from '../data/regionsData'; 
 
 const IsometricMap = () => {
-  // --- STATE & REF ---
   const mapRef = useRef(null);
   const audioRef = useRef(null);
   const [activeRegion, setActiveRegion] = useState(null);
-  
-  // State Baru: Default false (artinya suara HIDUP). Ubah jadi true kalau mau default MATI.
   const [isMuted, setIsMuted] = useState(false); 
 
-  // --- 1. ANIMASI PETA MELAYANG (GSAP) ---
+  // --- ANIMASI PETA MELAYANG ---
   useEffect(() => {
     if (mapRef.current) {
       gsap.to(mapRef.current, {
-        y: -20,
-        duration: 2.5,
+        y: -15, 
+        duration: 3, 
         repeat: -1,
         yoyo: true,
         ease: "sine.inOut"
@@ -27,163 +24,148 @@ const IsometricMap = () => {
     }
   }, []);
 
-  // --- 2. LOGIKA MUSIK (Auto Play & Mute Handling) ---
-  
-  // Effect A: Ganti Lagu saat Daerah Dipilih
+  // --- LOGIKA MUSIK ---
   useEffect(() => {
-    // Stop lagu lama
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
     }
-
-    // Setup lagu baru
     if (activeRegion && activeRegion.audio) {
       const newAudio = new Audio(activeRegion.audio);
       newAudio.volume = 0.5;
       newAudio.loop = true;
-      
-      // Simpan ke ref
       audioRef.current = newAudio;
-
-      // Cek status Mute sebelum play
-      if (!isMuted) {
-        newAudio.play().catch((err) => console.log("Autoplay blocked:", err));
-      }
+      if (!isMuted) newAudio.play().catch(()=>{});
     }
-
-    return () => {
-      if (audioRef.current) audioRef.current.pause();
-    };
+    return () => { if (audioRef.current) audioRef.current.pause(); };
   }, [activeRegion]); 
 
-  // Effect B: Pantau Tombol Mute/Unmute
   useEffect(() => {
-    if (audioRef.current) {
-      if (isMuted) {
-        audioRef.current.pause(); // Kalau dimute, pause
-      } else {
-        // Kalau di-unmute DAN lagi ada daerah aktif, play lagi
-        if (activeRegion) {
-            audioRef.current.play().catch((err) => console.log("Resume blocked:", err));
-        }
-      }
-    }
+    if (audioRef.current) isMuted ? audioRef.current.pause() : (activeRegion && audioRef.current.play().catch(()=>{}));
   }, [isMuted, activeRegion]);
 
-
   return (
-    <div className="relative w-full h-[85vh] flex items-center justify-center perspective-1000">
+    // WADAH UTAMA:
+    // md:items-end -> Di desktop kita taruh agak ke bawah biar gak nabrak judul
+    // md:pb-10 -> Kasih jarak dari bawah
+    <div className="relative w-full h-[85vh] md:h-screen flex items-center md:items-center justify-center perspective-1000 overflow-hidden">
       
-      {/* --- TOMBOL MUTE / UNMUTE --- */}
-      {/* Posisinya Absolute di pojok kanan atas wadah peta */}
-      <div className="absolute top-4 right-4 md:top-10 md:right-10 z-40">
+       {/* --- DEFINISI FILTER SVG (INI JANGAN DISINGKAT LEK, WAJIB ADA BIAR AIRNYA GERAK) --- */}
+       <svg className="absolute invisible w-0 h-0">
+        <defs>
+          <filter id="water-ripple-filter" x="-50%" y="-50%" width="200%" height="200%">
+            <feImage href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iNDAwIj48ZGVmcz48cmFkaWFsR3JhZGllbnQgaWQ9ImciIGN4PSI1MCUiIGN5PSI1MCUiIHI9IjUwJSIgZng9IjUwJSIgZnk9IjUwJSI+PHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzAwMCIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iI2ZmZiIvPjwvcmFkaWFsR3JhZGllbnQ+PC9kZWZzPjxyZWN0IHg9IjAiIHk9IjAiIHdpZHRoPSI0MDAiIGhlaWdodD0iNDAwIiBmaWxsPSJ1cmwoI2cpIi8+PC9zdmc+" result="rippleImage" />
+            <feDisplacementMap in="SourceGraphic" in2="rippleImage" scale="50" xChannelSelector="R" yChannelSelector="G" />
+            <feTurbulence type="fractalNoise" baseFrequency="0.015" numOctaves="2" result="noise" seed="1">
+                 <animate attributeName="baseFrequency" dur="30s" values="0.015;0.025;0.015" repeatCount="indefinite" />
+            </feTurbulence>
+            <feDisplacementMap in="SourceGraphic" in2="noise" scale="30" />
+          </filter>
+        </defs>
+      </svg>
+
+      {/* TOMBOL MUTE */}
+      <div className="absolute top-4 right-4 md:top-24 md:right-10 z-50">
         <button
           onClick={() => setIsMuted(!isMuted)}
-          className={`
-            flex items-center justify-center w-12 h-12 rounded-full border-2 backdrop-blur-md transition-all duration-300 shadow-[0_0_15px_rgba(0,0,0,0.5)]
-            ${isMuted 
-              ? 'bg-slate-800/80 border-gray-500 text-gray-400 hover:bg-slate-700' 
-              : 'bg-slate-900/80 border-yellow-500 text-yellow-400 hover:bg-yellow-500 hover:text-black hover:shadow-[0_0_20px_rgba(234,179,8,0.6)]'
-            }
-          `}
-          title={isMuted ? "Hidupkan Musik" : "Matikan Musik"}
+          className={`w-10 h-10 rounded-full border-2 border-[#292524] flex items-center justify-center transition-all ${isMuted ? 'bg-transparent opacity-50' : 'bg-[#292524] text-[#d6cbb8]'}`}
         >
-          {isMuted ? (
-            // ICON SPEAKER SILANG (MUTE)
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
-              <path d="M13.5 4.06c0-1.336-1.616-2.005-2.56-1.06l-4.5 4.5H4.508c-1.141 0-2.318 0-2.402.932l-.141 10.341c-.091 1.212.863 2.227 2.16 2.227h1.918l4.415 4.415c.944.945 2.56.276 2.56-1.06V4.06zM17.78 9.22a.75.75 0 10-1.06 1.06L18.44 12l-1.72 1.72a.75.75 0 101.06 1.06l1.72-1.72 1.72 1.72a.75.75 0 101.06-1.06L20.56 12l1.72-1.72a.75.75 0 10-1.06-1.06l-1.72 1.72-1.72-1.72z" />
-            </svg>
-          ) : (
-            // ICON SPEAKER GELOMBANG (UNMUTE)
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6 animate-pulse">
-              <path d="M13.5 4.06c0-1.336-1.616-2.005-2.56-1.06l-4.5 4.5H4.508c-1.141 0-2.318 0-2.402.932l-.141 10.341c-.091 1.212.863 2.227 2.16 2.227h1.918l4.415 4.415c.944.945 2.56.276 2.56-1.06V4.06zM17.78 9.22a.75.75 0 010 5.56.75.75 0 01-1.06-1.06 4 4 0 000-3.44.75.75 0 011.06-1.06zM19.48 6.65a.75.75 0 010 10.7 4.5 4.5 0 01-1.06-1.06 7.5 7.5 0 000-8.58.75.75 0 011.06-1.06z" />
-            </svg>
-          )}
+          {isMuted ? "🔇" : "🔊"}
         </button>
       </div>
 
-      {/* --- WADAH PETA UTAMA --- */}
-      <div ref={mapRef} className="relative w-full max-w-5xl aspect-3/4 md:aspect-video transition-all duration-500 mt-38">
+      {/* --- WADAH PETA (CONTAINER) --- */}
+      {/* FIX POSISI:
+          mt-20 (HP) -> Biar gak nabrak judul di HP.
+          md:mt-32 (Desktop) -> TURUN KE BAWAH LAGI biar gak nabrak judul besar.
+      */}
+      <div ref={mapRef} className="relative w-[95%] md:w-full max-w-md md:max-w-5xl aspect-square md:aspect-video transition-all duration-500 mt-48 md:mt-50">
         
+        {/* --- EFEK AIR BIRU --- */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[100%] h-[120%] md:w-[120%] md:h-[105%] z-[-1] pointer-events-none">
+            {/* Layer 1: Dasar Biru Laut */}
+            <div className="absolute inset-0 bg-blue-500/30 rounded-full blur-[50px] md:blur-[110px]" 
+                 style={{ filter: 'url(#water-ripple-filter)' }}></div>
+            
+            {/* Layer 2: Pantulan Cyan */}
+            <div className="absolute inset-0 bg-cyan-400/20 rounded-full blur-[40px] md:blur-[90px] animate-pulse" 
+                 style={{ filter: 'url(#water-ripple-filter)' }}></div>
+        </div>
+        
+        {/* GAMBAR PETA */}
         <Image 
           src="/assets/petasumatera.png"
-          alt="Peta Sumatera Isometric"
+          alt="Peta Sumatera"
           fill
-          className="object-contain drop-shadow-[0_35px_35px_rgba(0,0,0,0.5)]"
+          className="object-contain drop-shadow-[0_25px_50px_rgba(0,0,0,0.6)]" 
           priority
           unoptimized
         />
 
-        {/* --- LOOPING TITIK LOKASI (MAPPING DATA) --- */}
+        {/* --- LOOPING TITIK LOKASI --- */}
         {regionsData.map((region) => (
           <button
             key={region.id}
-            // PERBAIKAN DI SINI LEK:
-            // 1. '-translate-x-1/2 -translate-y-1/2': Biar koordinat 'top/left' itu dihitung dari TENGAH titik, bukan pojok kiri.
-            // 2. 'flex items-center justify-center': Biar radar dan titik utama pas di tengah-tengah tombol.
             className="absolute group z-10 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center"
             style={{ top: region.top, left: region.left }}
             onClick={() => setActiveRegion(region)}
           >
-            {/* Efek Radar (Ping) */}
-            {/* Kita kasih ukuran fix yang sama kayak titiknya biar ga melebar kemana-mana */}
-            <span className="absolute h-6 w-6 md:h-8 md:w-8 rounded-full bg-yellow-400 opacity-75 animate-ping"></span>
+            {/* Radar */}
+            <span className="absolute h-6 w-6 md:h-10 md:w-10 rounded-full bg-red-600/40 animate-ping"></span>
             
-            {/* Titik Inti */}
-            <div className="relative h-6 w-6 md:h-8 md:w-8 bg-linear-to-br from-yellow-400 to-orange-600 rounded-full border-2 border-white shadow-[0_0_15px_rgba(255,165,0,0.8)] transition-transform duration-300 group-hover:scale-125 flex items-center justify-center z-10">
-                {/* Titik putih kecil di tengah */}
-                <div className="h-2 w-2 bg-white rounded-full shadow-sm"></div>
+            {/* Pin Utama */}
+            <div className="relative w-4 h-4 md:w-6 md:h-6 bg-red-600 rounded-full border-2 border-white shadow-sm transition-transform duration-200 group-hover:scale-125 flex items-center justify-center text-white">
+               <div className="w-1 h-1 md:w-2 md:h-2 bg-white rounded-full"></div>
             </div>
 
-            {/* Label Nama Daerah */}
-            <div className="absolute top-full mt-2 bg-black/80 backdrop-blur-sm text-yellow-400 text-xs md:text-sm font-bold px-3 py-1 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0 whitespace-nowrap border border-yellow-500/30 pointer-events-none">
+            {/* Label Nama */}
+            <div className="hidden md:block absolute top-full mt-2 bg-[#e7e5e4] text-[#292524] border border-[#78350f] text-sm font-serif font-bold px-4 py-1 rounded-sm opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap tracking-widest uppercase shadow-lg">
               {region.name}
             </div>
           </button>
         ))}
       </div>
 
-      {/* --- MODAL POP-UP INFORMASI --- */}
+      {/* --- MODAL POP-UP (JURNAL) --- */}
       {activeRegion && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 transition-opacity duration-300 animate-in fade-in"
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-in fade-in duration-300"
              onClick={() => setActiveRegion(null)}>
-             
-          <div className="bg-slate-900/90 border border-yellow-600/50 text-white p-6 md:p-8 rounded-2xl max-w-lg w-full shadow-[0_0_50px_rgba(234,179,8,0.2)] transform scale-100 animate-in zoom-in duration-300 relative overflow-hidden"
-               onClick={(e) => e.stopPropagation()}>
-            
-            <div className="absolute top-0 right-0 w-32 h-32 bg-yellow-500/10 rounded-full blur-3xl -mr-10 -mt-10"></div>
+          <div className="absolute inset-0 bg-[#292524]/60 backdrop-blur-sm"></div>   
 
-            <div className="relative z-10">
-                <h2 className="text-3xl md:text-4xl font-serif font-bold text-transparent bg-clip-text bg-linear-to-r from-yellow-300 to-orange-500 mb-1">
+          <div className="bg-[#e5e0d1] text-[#292524] p-6 md:p-12 w-[90%] md:max-w-2xl shadow-2xl rotate-1 transform transition-all duration-300 relative max-h-[85vh] overflow-y-auto"
+               onClick={(e) => e.stopPropagation()}
+               style={{ backgroundImage: 'linear-gradient(#d6cbb8 1px, transparent 1px)', backgroundSize: '100% 2rem' }}> 
+            
+             <div className="relative z-10 font-serif">
+                <h2 className="text-2xl md:text-4xl font-black uppercase tracking-widest border-b-4 border-[#292524] pb-2 mb-4">
                     {activeRegion.culture}
                 </h2>
-                <h3 className="text-lg text-slate-400 mb-6 flex items-center gap-2">
-                    📍 {activeRegion.name}
-                </h3>
+                <div className="flex justify-between items-center mb-6">
+                    <span className="font-bold italic text-[#57534e]">Region: {activeRegion.name}</span>
+                </div>
 
-                <p className="text-slate-200 leading-relaxed text-sm md:text-base mb-6 border-l-4 border-yellow-600 pl-4 italic">
-                    "{activeRegion.description}"
+                <p className="text-sm md:text-lg leading-relaxed mb-8 font-medium opacity-90" style={{ fontFamily: 'Courier Prime, monospace' }}>
+                    {activeRegion.description}
                 </p>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-                    <div className="bg-slate-800/50 p-4 rounded-xl border border-white/5 hover:border-yellow-500/30 transition-colors">
-                        <span className="block text-xs text-yellow-500 uppercase tracking-wider font-bold mb-1">Kuliner Khas</span>
-                        <span className="text-white font-medium">{activeRegion.food}</span>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div className="border-2 border-[#292524] p-3 bg-[#d6cbb8]/50">
+                        <p className="text-xs font-bold uppercase tracking-wider mb-1 text-[#b45309]">Makanan Khas</p>
+                        <p className="font-bold">{activeRegion.food}</p>
                     </div>
-                    <div className="bg-slate-800/50 p-4 rounded-xl border border-white/5 hover:border-yellow-500/30 transition-colors">
-                        <span className="block text-xs text-yellow-500 uppercase tracking-wider font-bold mb-1">Pakaian Adat</span>
-                        <span className="text-white font-medium">{activeRegion.clothing}</span>
+                    <div className="border-2 border-[#292524] p-3 bg-[#d6cbb8]/50">
+                        <p className="text-xs font-bold uppercase tracking-wider mb-1 text-[#b45309]">Pakaian Adat</p>
+                        <p className="font-bold">{activeRegion.clothing}</p>
                     </div>
                 </div>
 
                 <button 
-                  className="w-full py-3 bg-linear-to-r from-yellow-600 to-orange-600 hover:from-yellow-500 hover:to-orange-500 text-black font-bold rounded-xl transition-all shadow-lg hover:shadow-yellow-500/20 active:scale-95"
+                  className="w-full py-3 bg-[#292524] text-[#e5e0d1] font-bold uppercase tracking-[0.2em] hover:bg-[#8a1c1c] transition-colors shadow-lg"
                   onClick={() => setActiveRegion(null)}
                 >
-                  Tutup Penjelasan
+                  Close Journal
                 </button>
-            </div>
+             </div>
           </div>
         </div>
       )}
