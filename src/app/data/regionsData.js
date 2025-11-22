@@ -5,6 +5,7 @@ export const regionsData = [
     id: 'sumut',
     name: 'Sumatera Utara',
     audio: '/assets/audio/bgm-sumut.mp3',
+    image: '/assets/sumut-culture.png',
     slug: 'sumut',
     culture: 'Suku Batak',
     description: 'Rumah bagi Suku Batak dengan Danau Toba yang legendaris. Dikenal dengan kain Ulos dan tradisi Mangulosi.',

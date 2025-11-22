@@ -1,21 +1,21 @@
-import { Cinzel, Inter } from "next/font/google"; // 1. Kita impor fontnya
+import { Cinzel, Inter } from "next/font/google"; 
 import "./globals.css";
+import GlobalAudio from "./components/GlobalAudio"; 
+import { AudioProvider } from "../context/AudioContext"; // 1. Import Provider
 
-// 2. Kita setting font utamanya (Cinzel buat judul biar sangar)
-const cinzel = Cinzel({ subsets: ["latin"], variable: '--font-cinzel' });
-const inter = Inter({ subsets: ["latin"], variable: '--font-inter' });
-
-export const metadata = {
-  title: "Sumatera Culture Fest",
-  description: "Menjelajahi keindahan budaya Pulau Emas",
-};
+// ... (font settings & metadata sama) ...
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      {/* 3. Kita pasang class fontnya di body biar bisa dipanggil di mana aja */}
-      <body className={`${cinzel.variable} ${inter.variable} font-sans antialiased`}>
-        {children}
+      <body className={`...`}>
+        
+        {/* 2. BUNGKUS SEMUANYA PAKAI PROVIDER */}
+        <AudioProvider>
+            <GlobalAudio /> 
+            {children}
+        </AudioProvider>
+
       </body>
     </html>
   );
