@@ -230,7 +230,7 @@ export const regionsData = [
     id: 'babel',
     name: 'Bangka Belitung',
     audio: '/assets/audio/bgm-bangka.mp3',
-    images: ['/assets/bl1.png', '/assets/bl2.png', '/assets/bl3.png', '/assets/bl4.png'],
+    images: ['/assets/BL1.png', '/assets/BL2.png', '/assets/BL3.png', '/assets/BL4.png'],
     slug: 'babel',
     culture: 'Suku Melayu Bangka',
     description: 'A coastal region shaped by Malay and Hakka Chinese culture, famous for its wooden stilt houses and tin mining history. The islands are peaceful and culturally blended.',
