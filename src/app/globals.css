@@ -1,20 +1,75 @@
 @import "tailwindcss";
 
+/* ========================================
+   SUMATERA CULTURE FEST - GLOBAL STYLES
+   Theme: Vintage Map / Old Journal
+   ======================================== */
 
+/* --- BASE STYLES --- */
 body {
   background-color: #d6cbb8; 
   color: #292524;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Better focus states for accessibility */
+*:focus-visible {
+  outline: 3px solid #b45309;
+  outline-offset: 2px;
+}
+
+/* --- MOBILE PERFORMANCE OPTIMIZATIONS --- */
+@media (max-width: 767px) {
+  /* Nonaktifkan animasi berat di mobile */
+  .animate-fog-slow,
+  .animate-fog-fast,
+  .animate-water-flow,
+  .animate-water-flow-reverse {
+    animation: none !important;
+  }
+  
+  /* Kurangi blur di mobile */
+  .blur-\[8px\],
+  .blur-\[20px\],
+  .blur-\[40px\] {
+    filter: none !important;
+  }
+  
+  /* Optimasi transform untuk GPU */
+  * {
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+  }
+}
+
+/* Reduced motion preference - matikan semua animasi */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* --- TEXTURES --- */
 
 /* 1. Tekstur Noise Halus */
 .bg-noise {
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
-  pointer-events: none; /* Biar bisa ditembus klik */
+  pointer-events: none;
 }
 
+/* 2. Tekstur Kertas Tua (RDR2 Style) */
 .bg-paper-texture {
-  background-color: #dec29d; /* Warna dasar kertas RDR2 */
+  background-color: #dec29d;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.15'/%3E%3C/svg%3E");
 }
 
@@ -56,11 +111,182 @@ body {
 }
 
 /* --- 2. TEKSTUR KABUT (DIGAMBAR PAKAI KODINGAN) --- */
-/* Ini teknik SVG Data URI. Kita bikin awan pakai matematika fractal noise */
 .bg-fog-texture {
-  /* Opacity di dalam sini kuubah jadi 0.8 biar lebih nyata */
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.01' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.8' fill='white'/%3E%3C/svg%3E");
-  
-  background-size: 300px 300px; /* Ukuran diperkecil biar detail asapnya nampak */
+  background-size: 300px 300px;
   background-repeat: repeat;
+}
+
+/* --- 3. ANIMASI AIR (Yang hilang di peta) --- */
+@keyframes water-flow {
+  0% {
+    transform: scale(1) rotate(0deg);
+    opacity: 0.3;
+  }
+  50% {
+    transform: scale(1.1) rotate(180deg);
+    opacity: 0.4;
+  }
+  100% {
+    transform: scale(1) rotate(360deg);
+    opacity: 0.3;
+  }
+}
+
+@keyframes water-flow-reverse {
+  0% {
+    transform: scale(1.1) rotate(360deg);
+    opacity: 0.4;
+  }
+  50% {
+    transform: scale(1) rotate(180deg);
+    opacity: 0.3;
+  }
+  100% {
+    transform: scale(1.1) rotate(0deg);
+    opacity: 0.4;
+  }
+}
+
+.animate-water-flow {
+  animation: water-flow 15s ease-in-out infinite;
+}
+
+.animate-water-flow-reverse {
+  animation: water-flow-reverse 20s ease-in-out infinite;
+}
+
+/* --- 4. ANIMASI PULSE UNTUK PIN LOKASI --- */
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.4);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+}
+
+.animate-pulse-ring {
+  animation: pulse-ring 2s ease-out infinite;
+}
+
+/* --- 5. HOVER EFFECTS --- */
+.hover-lift {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+}
+
+/* --- 6. LOADING SKELETON --- */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, #e5e0d1 25%, #d6cbb8 50%, #e5e0d1 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* --- 7. SCREEN READER ONLY --- */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* --- 8. VINTAGE BORDER STYLE --- */
+.vintage-border {
+  border: 2px solid #292524;
+  box-shadow: 4px 4px 0px #292524;
+  transition: all 0.2s ease;
+}
+
+.vintage-border:hover {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px #292524;
+}
+
+.vintage-border:active {
+  transform: translate(4px, 4px);
+  box-shadow: 0px 0px 0px #292524;
+}
+
+/* --- 9. ANIMASI IKAN & KAPAL DI LAUT --- */
+@keyframes swim {
+  0% {
+    left: var(--start-x);
+    top: var(--start-y);
+    opacity: 0;
+  }
+  5% {
+    opacity: 1;
+  }
+  95% {
+    opacity: 1;
+  }
+  100% {
+    left: var(--end-x);
+    top: var(--end-y);
+    opacity: 0;
+  }
+}
+
+.animate-swim {
+  animation-name: swim;
+  position: absolute;
+}
+
+/* Efek goyang sedikit untuk ikan */
+@keyframes fish-wobble {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-2px) rotate(2deg);
+  }
+  75% {
+    transform: translateY(2px) rotate(-2deg);
+  }
+}
+
+/* Efek goyang untuk kapal */
+@keyframes boat-rock {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(3deg);
+  }
+  75% {
+    transform: rotate(-3deg);
+  }
+}
+
+.animate-swim svg {
+  animation: fish-wobble 2s ease-in-out infinite;
+}
+
+.animate-swim svg[viewBox="0 0 24 16"] {
+  animation: boat-rock 3s ease-in-out infinite;
 }

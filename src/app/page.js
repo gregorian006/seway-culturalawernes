@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import IsometricMap from "./components/IsometricMap";
 import IntroClouds from "./components/IntroClouds";
+import AboutUsButton from "./components/AboutUsButton";
 import { useAudio } from '../context/AudioContext'; 
 
 export default function Home() {
@@ -20,6 +21,9 @@ export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-start md:justify-center bg-[#dec29d] overflow-hidden relative">
       
+      {/* About Us Button - Hanya di halaman peta */}
+      <AboutUsButton />
+      
       <IntroClouds 
          title="Welcome to our Project" 
          subtitle="Loading Culture..." 
@@ -34,7 +38,7 @@ export default function Home() {
         </h1>
         <div className="h-[2px] w-16 md:w-32 bg-[#292524] mx-auto my-2 md:my-4"></div>
         <p className="text-[#44403c] text-[10px] md:text-sm font-bold font-serif tracking-[0.2em] md:tracking-[0.4em] uppercase">
-          Culture Fest • Est. 2024
+          Cultural Awareness • Est. 2025
         </p>
       </div>
 
