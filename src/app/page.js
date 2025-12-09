@@ -4,12 +4,15 @@ import React, { useState, useEffect } from 'react';
 import IsometricMap from "./components/IsometricMap";
 import IntroClouds from "./components/IntroClouds";
 import AboutUsButton from "./components/AboutUsButton";
+import CulturalQuiz from "./components/CulturalQuiz";
+import CulturalChatbot from "./components/CulturalChatbot";
 import { useAudio } from '../context/AudioContext'; 
 
 export default function Home() {
   const [isNavigating, setIsNavigating] = useState(false);
+  const [showQuiz, setShowQuiz] = useState(false);
+  const [showChatbot, setShowChatbot] = useState(false);
   
-  // GANTI DARI 'stopAudio' JADI 'setTrack'
   const { setTrack } = useAudio(); 
 
   // Pas Halaman Peta Muncul -> PASANG LAGU TEMA PETA
@@ -23,6 +26,43 @@ export default function Home() {
       
       {/* About Us Button - Hanya di halaman peta */}
       <AboutUsButton />
+
+      {/* Quiz & Chatbot Buttons - Fixed position top right (avoid overlap with music player) */}
+      <div className="fixed top-4 right-4 md:top-6 md:right-6 z-40 flex gap-2">
+        {/* Quiz Button */}
+        <button
+          onClick={() => setShowQuiz(true)}
+          className="group flex items-center gap-2 px-3 py-2 md:px-4 md:py-3 bg-[#e5e0d1] border-2 border-[#292524] shadow-[4px_4px_0px_#292524] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_#292524] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all"
+          aria-label="Take Cultural Quiz"
+          title="Take Cultural Quiz"
+        >
+          <span className="text-xl md:text-2xl">📜</span>
+          <div className="hidden lg:block text-left">
+            <p className="text-[8px] font-bold uppercase tracking-widest text-[#b45309]">Challenge</p>
+            <p className="text-[10px] font-black font-serif text-[#292524] uppercase">Quiz</p>
+          </div>
+        </button>
+
+        {/* Chatbot Button */}
+        <button
+          onClick={() => setShowChatbot(true)}
+          className="group flex items-center gap-2 px-3 py-2 md:px-4 md:py-3 bg-[#292524] text-[#e5e0d1] border-2 border-[#292524] shadow-[4px_4px_0px_#b45309] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_#b45309] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all"
+          aria-label="Chat with AI Guide"
+          title="Chat with Cultural Sage"
+        >
+          <span className="text-xl md:text-2xl">🧙</span>
+          <div className="hidden lg:block text-left">
+            <p className="text-[8px] font-bold uppercase tracking-widest text-[#d6cbb8]">AI Guide</p>
+            <p className="text-[10px] font-black font-serif text-[#e5e0d1] uppercase">Chat</p>
+          </div>
+        </button>
+      </div>
+      
+      {/* Quiz Modal */}
+      {showQuiz && <CulturalQuiz onClose={() => setShowQuiz(false)} />}
+      
+      {/* Chatbot Modal */}
+      {showChatbot && <CulturalChatbot onClose={() => setShowChatbot(false)} />}
       
       <IntroClouds 
          title="Welcome to our Project" 
