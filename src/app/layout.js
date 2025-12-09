@@ -2,6 +2,7 @@ import { Cinzel, Inter } from "next/font/google";
 import "./globals.css";
 import GlobalAudio from "./components/GlobalAudio"; 
 import { AudioProvider } from "../context/AudioContext";
+import AuthProvider from "./components/AuthProvider";
 
 // Font Configuration
 const cinzel = Cinzel({ 
@@ -42,12 +43,14 @@ export default function RootLayout({ children }) {
           Skip to main content
         </a>
 
-        <AudioProvider>
-            <GlobalAudio /> 
-            <main id="main-content">
-              {children}
-            </main>
-        </AudioProvider>
+        <AuthProvider>
+          <AudioProvider>
+              <GlobalAudio /> 
+              <main id="main-content">
+                {children}
+              </main>
+          </AudioProvider>
+        </AuthProvider>
 
       </body>
     </html>

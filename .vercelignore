@@ -1,0 +1,17 @@
+# Environment files
+.env.local
+.env
+
+# Node modules
+node_modules
+
+# Development files
+.vscode
+*.log
+
+# Documentation (optional, comment out if you want docs deployed)
+*.md
+!README.md
+
+# Railway config (not needed in Vercel)
+railway.json
